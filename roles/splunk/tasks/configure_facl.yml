@@ -20,12 +20,19 @@
         - true
         - false
 
+    - name: "Check if {{ logrotate_file }} is present"
+      stat:
+        path: "{{ logrotate_file }}"
+      register: result_logrotate_file
+      become: true
+
     - name: Add setfacl to logrotate script
       lineinfile:
         path: "{{ logrotate_file }}"
         insertbefore: 'endscript'
         line: '        /usr/bin/setfacl -Rm u:{{ splunk_nix_user }}:rx /var/log'
       become: True
+      when: result_logrotate_file.stat.exists
 
     - name: Check if auditd.conf is present
       stat:
