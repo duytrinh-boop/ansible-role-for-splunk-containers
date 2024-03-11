@@ -30,3 +30,10 @@
 - name: Install additional utilities and troubleshooting tools
   include_tasks: install_utilities.yml
   when: install_utilities
+
+- name: |
+    "Fix splunk-start homepath error on containers: 
+    homePath='/opt/splunk/var/lib/splunk/audit/db' of index=_audit on unusable filesystem. 
+    Validating databases (splunkd validatedb) failed with code '1'. "
+  include_tasks: fix_optimistic_file_lock.yml
+  when: ansible_virtualization_type == 'docker' # or any other container type. Dependent on gather_facts
