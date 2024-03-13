@@ -30,3 +30,24 @@
   vars_files:
     - ../environments/vault.yml
 
+# we are not including search head cluster servers here. They have their own playbook splunk_shc_deploy.yml
+- hosts:
+    - monitoringconsole
+    - search 
+    - licensemaster
+  roles:
+  - ../roles/splunk
+  vars:
+    - deployment_task: configure_idxc_sh.yml
+  vars_files:
+    - ../environments/vault.yml
+
+## make all hosts search peers of monitoring console
+- hosts:
+    - monitoringconsole
+  roles:
+    - ../roles/splunk
+  vars:
+    - deployment_task: configure_distributed_search_peer.yml
+  vars_files:
+    - ../environments/vault.yml
