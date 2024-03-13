@@ -6,3 +6,6 @@
   serial: 50
   vars:
     - deployment_task: configure_apps.yml
+  vars_files:
+    - ../environments/vault.yml
+

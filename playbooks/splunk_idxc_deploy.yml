@@ -7,6 +7,9 @@
     - ../roles/splunk
   vars:
     - deployment_task: check_splunk.yml
+  vars_files:
+    - ../environments/vault.yml
+
 
 - hosts:
     - clustermanager
@@ -14,6 +17,9 @@
     - ../roles/splunk
   vars:
     - deployment_task: configure_idxc_manager.yml
+  vars_files:
+    - ../environments/vault.yml
+
 
 - hosts:
     - indexer
@@ -21,3 +27,6 @@
     - ../roles/splunk
   vars:
     - deployment_task: configure_idxc_member.yml
+  vars_files:
+    - ../environments/vault.yml
+

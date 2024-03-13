@@ -9,6 +9,9 @@
     - ../roles/splunk
   vars:
     deployment_task: check_splunk.yml
+  vars_files:
+    - ../environments/vault.yml
+
 
 - hosts:
     - licensemaster
@@ -21,6 +24,9 @@
     - ../roles/splunk
   vars:
     deployment_task: check_splunk.yml
+  vars_files:
+    - ../environments/vault.yml
+
 
 - hosts:
     - search
@@ -32,6 +38,9 @@
     - ../roles/splunk
   vars:
     deployment_task: check_splunk.yml
+  vars_files:
+    - ../environments/vault.yml
+
 
 - hosts:
     - clustermanager
@@ -43,6 +52,9 @@
   vars:
     deployment_task: set_maintenance_mode.yml
     state: enable
+  vars_files:
+    - ../environments/vault.yml
+
 
 - hosts:
     - indexer
@@ -54,6 +66,9 @@
     - ../roles/splunk
   vars:
     deployment_task: check_splunk.yml
+  vars_files:
+    - ../environments/vault.yml
+
 
 - hosts:
     - clustermanager
@@ -65,3 +80,6 @@
   vars:
     deployment_task: set_maintenance_mode.yml
     state: disable
+  vars_files:
+    - ../environments/vault.yml
+
