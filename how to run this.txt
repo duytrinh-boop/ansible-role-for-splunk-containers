@@ -1,0 +1,3 @@
+
+ansible-playbook -i environments/development/<inventory.ini> playbooks/splunk_install_or_upgrade.yml --vault-password-file=.vault_pass
+ansible-playbook -i environments/development/<inventory.ini> playbooks/splunk_idxc_deploy.yml --vault-password-file=.vault_pass
