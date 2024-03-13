@@ -19,14 +19,22 @@
     become: true
     when:
       - splunk_license_group=="Enterprise"
+  - name: Find license files in the specified directory
+    delegate_to: localhost
+    find:
+      paths: "{{ license_files_dir_path }}"
+      file_type: file
+    register: splunk_license_found
+
   - name: Copy license file
+    debugger: on_failed
     copy:
-      src: "{{ item }}"
-      dest: "{{ splunk_home }}/etc/licenses/enterprise/{{ item }}"
+      src: "{{ item.path }}"
+      dest: "{{ splunk_home }}/etc/licenses/enterprise/{{ item.path | basename }}"
       owner: "{{ splunk_nix_user }}"
       group: "{{ splunk_nix_group }}"
       mode: "0600"
-    loop: "{{ splunk_license_file }}"
+    loop: "{{ splunk_license_found.files }}"
     become: true
     notify: restart splunk
     when:
@@ -57,6 +65,7 @@
   when:
     - not splunk_license_group=="Peer"
     - splunk_install_type=="full"
+    - "'licensemaster' in group_names"
 
 - name: Configure License Peer
   block:
@@ -93,5 +102,6 @@
       - encrypted_secret_value.stdout == "" or (splunk_general_key != decrypted_secret_value.stdout | default(''))
     no_log: true
   when:
-    - splunk_license_group=="Peer"
+    # - splunk_license_group=="Peer"
     - splunk_install_type=="full"
+    - "not 'licensemaster' in group_names"

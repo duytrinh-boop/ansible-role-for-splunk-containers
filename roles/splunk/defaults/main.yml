@@ -19,7 +19,8 @@ splunk_nix_group: splunk
 local_os_user: false # Whenther or not to force creation of a user using the `luseradd` or not.
 local_os_group: false # Whether or not to force creation of a group using the `lgroupadd` or not.
 splunk_uri_lm: undefined
-splunk_license_file: [] # This can be a list of license files to copy to the host.
+license_files_dir_path: "{{ role_path }}/files/splunk_licenses" # put all the license files in this directory. 
+# splunk_license_file: [] # This can be a list of license files to copy to the host.
 splunk_license_group: Trial # The default matches with the group splunk ships with. You can also set the value via a group_vars or host_vars file.
 splunk_uri_cm: undefined
 splunk_uri_ds: undefined # e.g. mydeploymentserver.mydomain.com:8089 ; Note that you must also configure the clientName var under either group_vars or host_vars for deploymentclient.conf to be configured

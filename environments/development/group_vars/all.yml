@@ -1,7 +1,7 @@
 ---
 splunk_uri_lm: "https://{{ groups['licensemaster'] | first }}:8089" # need to get in list
 splunk_license_group: Enterprise
-license_file_dir: "{{ role_path }}/files/"
+license_files_dir_path: "{{ role_path }}/files/splunk_licenses"
 license_file_name: "Splunk.License"
 license_file_path: "{{ license_file_dir }}/{{ license_file_name }}"
 #splunk_uri_cm: https://new_CM1.tintin.website:8089
