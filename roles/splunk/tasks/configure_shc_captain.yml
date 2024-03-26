@@ -5,6 +5,11 @@
   become_user: "{{ splunk_nix_user }}"
   register: shc_bootstrap_result
   changed_when: shc_bootstrap_result.rc == 0
-  failed_when: shc_bootstrap_result.rc != 0
+    # Accepting return code 22 along with 0. Return code 22 indicates that the nodes are already part of another cluster.
+  # This scenario occurs when the nodes listed in the -servers_list are already members of an existing cluster.
+  # In such cases, the nodes need to be removed from the old cluster and 'splunk clean raft' should be run on each
+  # node to reuse them in a new cluster. This is not necessarily an error state depending on the context, hence
+  # it's treated as an acceptable return code in this playbook.
+  failed_when: shc_bootstrap_result.rc != 0 and shc_bootstrap_result.rc != 22
   run_once: true
-  no_log: true
+  no_log: false
