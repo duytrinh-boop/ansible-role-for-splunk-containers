@@ -46,6 +46,6 @@
   roles:
     - ../roles/splunk
   vars:
-    deployment_task: configure_shc_integrate_idxcluster.yml
+    deployment_task: configure_idxc_sh.yml
   vars_files:
     - ../environments/vault.yml
