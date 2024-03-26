@@ -20,6 +20,7 @@
     when:
       - splunk_license_group=="Enterprise"
   - name: Find license files in the specified directory
+    become: false
     delegate_to: localhost
     find:
       paths: "{{ license_files_dir_path }}"
