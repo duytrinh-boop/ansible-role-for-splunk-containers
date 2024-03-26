@@ -5,10 +5,14 @@
   command: "{{ splunk_home }}/bin/splunk add search-server https://{{ item }}:{{ splunkd_port }} -auth {{ splunk_admin_username }}:{{ vault_splunk_admin_password }} -remoteUsername {{ splunk_admin_username }} -remotePassword {{ vault_splunk_admin_password }}" # appends fqdn to hostname in https://, if not present in inventory
   register: configure_distributed_search_peer
   changed_when: configure_distributed_search_peer.rc == 0
-  failed_when: configure_distributed_search_peer.rc != 0
+  failed_when: 
+    - configure_distributed_search_peer.rc != 0
+    - "'already exists' not in configure_distributed_search_peer.stderr"
+    - "'conflicts with this server\\'s name' not in configure_distributed_search_peer.stderr" # this will fail when trying to add itself as search peer. No log used to hide password from logs
+    
   become: true
   ignore_errors: true
   become_user: "{{ splunk_nix_user }}"
-  no_log: true # this will fail when trying to add itself as search peer. No log used to hide password from logs
+  no_log: true 
   when: "'monitoringconsole' in group_names"
   loop: "{{ groups['full'] }}"
