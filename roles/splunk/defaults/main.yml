@@ -92,3 +92,6 @@ splunkshcrep_port: {desc: "Splunk Search Head Clustering Replication", protocol:
 splunk_firewall_ports: # List of ports to allow through local firewall in dict form
   - "{{ splunkweb_port }}"
   - "{{ splunkapi_port }}"
+
+patch_auto_restart_services: True # whether or not to restart services automatically, when patching the operating system.
+patch_automatically_reboot_server: True # If true, server will automatically reboot if necessary after patching operating system.

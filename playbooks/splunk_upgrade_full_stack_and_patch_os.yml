@@ -1,0 +1,134 @@
+---
+# Example playbook to properly upgrade a single-site indexer cluster and search head cluster using the splunk role from ansible-role-for-splunk
+- hosts:
+    - clustermanager
+  become: yes
+  any_errors_fatal: true
+  max_fail_percentage: 0
+  roles:
+    - ../roles/splunk
+  vars:
+    deployment_task: check_splunk.yml
+  vars_files:
+    - ../environments/vault.yml
+
+- hosts:
+    - clustermanager
+  become: yes
+  any_errors_fatal: true
+  max_fail_percentage: 0
+  roles:
+    - ../roles/splunk
+  vars:
+    deployment_task: os_patch_and_upgrade.yml
+  vars_files:
+    - ../environments/vault.yml
+
+- hosts:
+    - licensemaster
+    - shdeployer
+    - deploymentserver
+  become: yes
+  any_errors_fatal: true
+  max_fail_percentage: 0
+  roles:
+    - ../roles/splunk
+  vars:
+    deployment_task: check_splunk.yml
+  vars_files:
+    - ../environments/vault.yml
+
+- hosts:
+    - licensemaster
+    - shdeployer
+    - deploymentserver
+  become: yes
+  any_errors_fatal: true
+  max_fail_percentage: 0
+  roles:
+    - ../roles/splunk
+  vars:
+    deployment_task: os_patch_and_upgrade.yml
+  vars_files:
+    - ../environments/vault.yml
+
+- hosts:
+    - search
+  serial: 50
+  become: yes
+  any_errors_fatal: true
+  max_fail_percentage: 0
+  roles:
+    - ../roles/splunk
+  vars:
+    deployment_task: check_splunk.yml
+  vars_files:
+    - ../environments/vault.yml
+
+- hosts:
+    - search
+  serial: 50
+  become: yes
+  any_errors_fatal: true
+  max_fail_percentage: 0
+  roles:
+    - ../roles/splunk
+  vars:
+    deployment_task: os_patch_and_upgrade.yml
+  vars_files:
+    - ../environments/vault.yml
+
+- hosts:
+    - clustermanager
+  become: yes
+  any_errors_fatal: true
+  max_fail_percentage: 0
+  roles:
+    - ../roles/splunk
+  vars:
+    deployment_task: set_maintenance_mode.yml
+    state: enable
+  vars_files:
+    - ../environments/vault.yml
+
+
+- hosts:
+    - indexer
+  serial: 100
+  become: yes
+  any_errors_fatal: true
+  max_fail_percentage: 0
+  roles:
+    - ../roles/splunk
+  vars:
+    deployment_task: check_splunk.yml
+  vars_files:
+    - ../environments/vault.yml
+
+
+- hosts:
+    - indexer
+  serial: 100
+  become: yes
+  any_errors_fatal: true
+  max_fail_percentage: 0
+  roles:
+    - ../roles/splunk
+  vars:
+    deployment_task: os_patch_and_upgrade.yml
+  vars_files:
+    - ../environments/vault.yml
+
+- hosts:
+    - clustermanager
+  become: yes
+  any_errors_fatal: true
+  max_fail_percentage: 0
+  roles:
+    - ../roles/splunk
+  vars:
+    deployment_task: set_maintenance_mode.yml
+    state: disable
+  vars_files:
+    - ../environments/vault.yml
+

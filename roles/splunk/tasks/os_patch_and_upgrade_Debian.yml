@@ -1,0 +1,32 @@
+---
+- name: PATCH | Perform a dist-upgrade.
+  ansible.builtin.apt:
+    upgrade: dist
+    update_cache: yes
+
+- name: "PATCH | Ensure needrestart is installed"
+  apt:
+    name: "needrestart"
+    state: "present"
+  register: "patch_utils_installed"
+  retries: "3"
+  until: "patch_utils_installed is succeeded"
+
+- name: "PATCH | Check if services need restarting with checkrestart"
+  shell: 
+    cmd: needrestart -q -r a  # -q <quiet>, -r <restartmode>, (a)utomatically restart
+  changed_when: "needrestart_result.stdout_lines | length > 0"
+  register: "needrestart_result"
+  when: 'patch_auto_restart_services'  
+
+- name: PATCH | Check if a reboot is required.
+  ansible.builtin.stat:
+    path: /var/run/reboot-required
+    get_checksum: no
+  register: patch_reboot_required
+  changed_when: 'patch_reboot_required.stat.exists'
+  notify:
+          - "Reboot after patching"
+  when: 'patch_automatically_reboot_server'
+
+

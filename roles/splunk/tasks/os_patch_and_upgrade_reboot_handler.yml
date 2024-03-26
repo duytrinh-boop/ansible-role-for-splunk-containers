@@ -1,0 +1,25 @@
+---
+#https://www.jeffgeerling.com/blog/2018/reboot-and-wait-reboot-complete-ansible-playbook
+- name: "Reboot after patching"
+  block:
+    - name: "Reboot after patching"
+      shell: "sleep 5 && reboot"
+      async: 1
+      poll: 0
+
+    - name: Wait for the reboot to complete if there was a change.
+      wait_for_connection:
+        connect_timeout: 20
+        sleep: 5
+        delay: 5
+        timeout: 300
+    
+    - name: DEBIAN | Remove dependencies that are no longer required.
+      ansible.builtin.apt:
+        autoremove: yes
+      when: ansible_os_family == 'Debian'
+
+  rescue:
+    - name: "RESCUE | Ensure we are not in rescue mode"
+      wait_for_connection:
+        timeout: 120
