@@ -6,6 +6,6 @@
     - ../roles/splunk
   serial: 50
   vars:
-    - deployment_task: check_splunk.yml
+    deployment_task: check_splunk.yml
   vars_files:
     - ../environments/vault.yml
