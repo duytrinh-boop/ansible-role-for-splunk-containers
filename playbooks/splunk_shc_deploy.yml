@@ -6,7 +6,7 @@
   roles:
     - ../roles/splunk
   vars:
-    - deployment_task: check_splunk.yml
+    deployment_task: check_splunk.yml
   vars_files:
     - ../environments/vault.yml
 
@@ -16,7 +16,7 @@
   roles:
     - ../roles/splunk
   vars:
-    - deployment_task: configure_shc_deployer.yml
+    deployment_task: configure_shc_deployer.yml
   vars_files:
     - ../environments/vault.yml
 
@@ -26,7 +26,7 @@
   roles:
     - ../roles/splunk
   vars:
-    - deployment_task: configure_shc_members.yml
+    deployment_task: configure_shc_members.yml
   vars_files:
     - ../environments/vault.yml
 
@@ -36,7 +36,16 @@
   roles:
     - ../roles/splunk
   vars:
-    - deployment_task: configure_shc_captain.yml
+    deployment_task: configure_shc_captain.yml
   vars_files:
     - ../environments/vault.yml
 
+
+- hosts:
+    - shc
+  roles:
+    - ../roles/splunk
+  vars:
+    deployment_task: configure_shc_integrate_idxcluster.yml
+  vars_files:
+    - ../environments/vault.yml
