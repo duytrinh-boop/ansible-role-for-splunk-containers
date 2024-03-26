@@ -5,3 +5,6 @@ ansible-playbook -i environments/development/<inventory.ini> playbooks/splunk_id
 
 ansible-playbook -i environments/development/inventory_ksat_old_prod.yml.ini --limit full playbooks/splunk_install_or_upgrade.yml --vault-password-file=.vault_pass --limit full
 ansible-playbook -i environments/development/inventory_ksat_old_prod.yml.ini --limit full playbooks/splunk_idxc_deploy.yml --vault-password-file=.vault_pass
+ansible-playbook -i environments/development/inventory_ksat_old_prod.yml.ini --limit full playbooks/splunk_shc_deploy.yml --vault-password-file=.vault_pass
+
+ansible-playbook -i environments/development/inventory_ksat_old_prod.yml.ini --limit full playbooks/splunk_upgrade_full_stack_and_patch_os.yml --vault-password-file=.vault_pass
