@@ -11,4 +11,4 @@
   become_user: "{{ splunk_nix_user }}"
   no_log: true # this will fail when trying to add itself as search peer. No log used to hide password from logs
   when: "'monitoringconsole' in group_names"
-  loop: "{{ groups['nonidxcluster'] }}"
+  loop: "{{ groups['full'] }}"
