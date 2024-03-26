@@ -4,4 +4,4 @@
   include_vars: "{{ ansible_os_family }}.yml"
 
 - name: "Include os_patch_and_upgrade_{{ ansible_os_family }}.yml"
-  include_task: os_patch_and_upgrade_{{ ansible_os_family }}.yml"
+  include_task: "os_patch_and_upgrade_{{ ansible_os_family }}.yml"

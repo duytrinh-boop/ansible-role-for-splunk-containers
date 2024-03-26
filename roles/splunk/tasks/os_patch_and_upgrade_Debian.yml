@@ -26,7 +26,7 @@
   register: patch_reboot_required
   changed_when: 'patch_reboot_required.stat.exists'
   notify:
-          - "Reboot after patching"
+    - "Reboot after patching"
   when: 'patch_automatically_reboot_server'
 
 
