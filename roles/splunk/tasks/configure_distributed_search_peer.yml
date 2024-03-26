@@ -1,7 +1,8 @@
 ---
   
 - name: Configure Distributed Search Peer on monitoring console
-  command: "{{ splunk_home }}/bin/splunk add search-server https://{{ item if (item | regex_search(company_domain_fqdn | regex_escape)) else item + '.' + company_domain_fqdn }}:{{ splunkd_port }} -auth {{ splunk_admin_username }}:{{ vault_splunk_admin_password }} -remoteUsername {{ splunk_admin_username }} -remotePassword {{ vault_splunk_admin_password }}" # appends fqdn to hostname in https://, if not present in inventory
+  # command: "{{ splunk_home }}/bin/splunk add search-server https://{{ item if (item | regex_search(company_domain_fqdn | regex_escape)) else item + '.' + company_domain_fqdn }}:{{ splunkd_port }} -auth {{ splunk_admin_username }}:{{ vault_splunk_admin_password }} -remoteUsername {{ splunk_admin_username }} -remotePassword {{ vault_splunk_admin_password }}" # appends fqdn to hostname in https://, if not present in inventory
+  command: "{{ splunk_home }}/bin/splunk add search-server https://{{ item }}:{{ splunkd_port }} -auth {{ splunk_admin_username }}:{{ vault_splunk_admin_password }} -remoteUsername {{ splunk_admin_username }} -remotePassword {{ vault_splunk_admin_password }}" # appends fqdn to hostname in https://, if not present in inventory
   register: configure_distributed_search_peer
   changed_when: configure_distributed_search_peer.rc == 0
   failed_when: configure_distributed_search_peer.rc != 0

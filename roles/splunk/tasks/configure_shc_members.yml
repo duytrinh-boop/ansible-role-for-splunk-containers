@@ -1,4 +1,43 @@
 ---
+- name: Set config_options to an empty dictionary
+  set_fact:
+    config_options: {}
+
+- name: Project Idempotent | Define configuration options and their desired values
+  set_fact:
+    config_options:
+      conf_deploy_fetch_url: { expected_value: "https://{{ splunk_shc_deployer }}:{{ splunkd_port }}", current_value: null }
+      mgmt_uri: { expected_value: "https://{{ splunk_mgmt_uri }}:{{ splunkd_port }}", current_value: null }
+      pass4SymmKey: { expected_value: "{{ splunk_shc_key }}", current_value: null, splunk_encrypted_variable: true }
+      shcluster_label: { expected_value: "{{ splunk_shc_label }}", current_value: null }
+
+
+- name: Include task to check and compare current configuration values
+  include_tasks: check_splunk_configuration_value.yml
+  loop: "{{ config_options | dict2items }}"
+  loop_control:
+    loop_var: config_item
+  vars:
+    write_result_to_config_options: true
+    req_secret_conf: server
+    req_secret_section: shclustering
+
+# - name: print config_options after fetching
+#   debug:
+#     msg: "{{ config_options }}"
+
+- name: Initialize re_initialization_required to false
+  set_fact:
+    re_initialization_required: false
+
+- name: Check if re-initialization is required based on diff in config_options
+  set_fact:
+    re_initialization_required: true
+  when: (item.value.expected_value | string) != (item.value.current_value | string)
+  loop: "{{ config_options | dict2items }}"
+  loop_control:
+    label: "{{ item.key }}"
+
 - name: Initialize shc config
   command: "{{ splunk_home }}/bin/splunk init shcluster-config -auth {{ splunk_auth }} -mgmt_uri https://{{ splunk_mgmt_uri }}:{{ splunkd_port }} -replication_port {{ splunk_shc_rep_port }} -replication_factor {{ splunk_shc_rf }} -conf_deploy_fetch_url https://{{ splunk_shc_deployer }}:{{ splunkd_port }} -secret {{ splunk_shc_key }} -shcluster_label {{ splunk_shc_label }}"
   become: true
@@ -8,3 +47,5 @@
   failed_when: shc_init_result.rc != 0
   notify: restart splunk
   no_log: true 
+  when: re_initialization_required
+
