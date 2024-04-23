@@ -37,3 +37,12 @@
 
 - name: Include post-install tasks
   include_tasks: post_install.yml
+
+# need to explicitly start instead of waiting for handler, else indexer cluster check below will fail, when upgrading the cm. 
+- name: Start splunk after upgrade
+  include_tasks: splunk_start.yml
+
+# checks if indexer cluster is green and ready for indexing, before continuing
+- name: Wait for indexer cluster to have status up before continuing
+  include_tasks: post_install_wait_for_indexer_status_up.yml
+  #when: "'indexers' in group_names"

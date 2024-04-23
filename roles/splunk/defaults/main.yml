@@ -19,7 +19,8 @@ splunk_nix_group: splunk
 local_os_user: false # Whenther or not to force creation of a user using the `luseradd` or not.
 local_os_group: false # Whether or not to force creation of a group using the `lgroupadd` or not.
 splunk_uri_lm: undefined
-splunk_license_file: [] # This can be a list of license files to copy to the host.
+license_files_dir_path: "{{ role_path }}/files/splunk_licenses" # put all the license files in this directory. 
+# splunk_license_file: [] # This can be a list of license files to copy to the host.
 splunk_license_group: Trial # The default matches with the group splunk ships with. You can also set the value via a group_vars or host_vars file.
 splunk_uri_cm: undefined
 splunk_uri_ds: undefined # e.g. mydeploymentserver.mydomain.com:8089 ; Note that you must also configure the clientName var under either group_vars or host_vars for deploymentclient.conf to be configured
@@ -28,7 +29,7 @@ phoneHomeIntervalInSecs: undefined
 splunk_general_key: undefined # Configures a pass4SymmKey in server.conf under the general stanza
 splunk_ds_key: undefined # Configures a pass4SymmKey in server.conf for authenticating against a deployment server
 splunk_admin_username: admin
-splunk_admin_password: undefined # Use ansible-vault encrypt_string, e.g. ansible-vault encrypt_string --ask-vault-pass 'var_value_to_encrypt' --name 'var_name'
+#splunk_admin_password: undefined # Use ansible-vault encrypt_string, e.g. ansible-vault encrypt_string --ask-vault-pass 'var_value_to_encrypt' --name 'var_name'
 splunk_configure_secret: false # If set to true, you need to update files/splunk.secret
 splunk_secret_file: splunk.secret # Used to specify your splunk.secret filename(s), files should be placed in the "files" folder of the role
 # Although there are tasks for the following Splunk configurations in this role, they are not included in any tasks by default. You can add them to your install_splunk.yml if you would like to have Ansible manage any of these files
@@ -53,7 +54,7 @@ app_relative_path: # set a sub-path you want to sync within a repo. If the repo 
 splunk_app_deploy_path: undefined # Path under $SPLUNK_HOME/ to deploy apps to - Note that this may be set in group_vars, host_vars, playbook vars, or inside the git_apps dictionary within host_vars
 splunk_auditd_configure: false  # Whether or not to install auditd filtering rules for splunk launched executables
 # IDXC Vars
-splunk_idxc_key: mypass4symmkey
+# splunk_idxc_key: mypass4symmkey
 splunk_idxc_rf: 2
 splunk_idxc_sf: 2
 splunk_idxc_rep_port: 9887
@@ -63,13 +64,13 @@ splunk_apply_cluster_bundle_delay: 60 # Delay in seconds between retries to appl
 splunk_apply_shcluster_bundle_retries: 3 # How many times to retry SHC bundle apply if it fails
 splunk_apply_shcluster_bundle_delay: 60 #  Delay in seconds between retries to apply SHC bundle
 # SHC Vars
-splunk_shc_key: mypass4symmkey
+# splunk_shc_key: mypass4symmkey
 splunk_shc_label: myshc
 splunk_shc_rf: 3
 splunk_shc_rep_port: 8100
 splunk_shc_target_group: shc
 splunk_shc_deployer: "{{ groups['shdeployer'] | first }}" # If you manage multiple SHCs, configure the var value in group_vars
-splunk_shc_uri_list: "{% for h in groups[splunk_shc_target_group] %}https://{{ hostvars[h].splunk_mgmt_uri }}:{{ splunkd_port }}{% if not loop.last %},{% endif %}{% endfor %}" # If you manage multiple SHCs, configure the var value in group_vars
+# splunk_shc_uri_list: "{% for h in groups[splunk_shc_target_group] %}https://{{ hostvars[h].splunk_mgmt_uri }}:{{ splunkd_port }}{% if not loop.last %},{% endif %}{% endfor %}" # If you manage multiple SHCs, configure the var value in group_vars
 start_splunk_handler_fired: false # Do not change; used to prevent unnecessary splunk restarts
 # Linux and scripting related vars
 add_crashlog_script: false # Set to true to install a script and cron job to automatically cleanup splunk crash logs older than 7 days
@@ -91,3 +92,6 @@ splunkshcrep_port: {desc: "Splunk Search Head Clustering Replication", protocol:
 splunk_firewall_ports: # List of ports to allow through local firewall in dict form
   - "{{ splunkweb_port }}"
   - "{{ splunkapi_port }}"
+
+patch_auto_restart_services: True # whether or not to restart services automatically, when patching the operating system.
+patch_automatically_reboot_server: True # If true, server will automatically reboot if necessary after patching operating system.

@@ -12,6 +12,17 @@
   vars_files:
     - ../environments/vault.yml
 
+- hosts:
+    - clustermanager
+  become: yes
+  any_errors_fatal: true
+  max_fail_percentage: 0
+  roles:
+    - ../roles/splunk
+  vars:
+    deployment_task: os_patch_and_upgrade.yml
+  vars_files:
+    - ../environments/vault.yml
 
 - hosts:
     - licensemaster
@@ -27,6 +38,19 @@
   vars_files:
     - ../environments/vault.yml
 
+- hosts:
+    - licensemaster
+    - shdeployer
+    - deploymentserver
+  become: yes
+  any_errors_fatal: true
+  max_fail_percentage: 0
+  roles:
+    - ../roles/splunk
+  vars:
+    deployment_task: os_patch_and_upgrade.yml
+  vars_files:
+    - ../environments/vault.yml
 
 - hosts:
     - search
@@ -41,6 +65,18 @@
   vars_files:
     - ../environments/vault.yml
 
+- hosts:
+    - search
+  serial: 50
+  become: yes
+  any_errors_fatal: true
+  max_fail_percentage: 0
+  roles:
+    - ../roles/splunk
+  vars:
+    deployment_task: os_patch_and_upgrade.yml
+  vars_files:
+    - ../environments/vault.yml
 
 - hosts:
     - clustermanager
@@ -69,6 +105,19 @@
   vars_files:
     - ../environments/vault.yml
 
+
+- hosts:
+    - indexer
+  serial: 100
+  become: yes
+  any_errors_fatal: true
+  max_fail_percentage: 0
+  roles:
+    - ../roles/splunk
+  vars:
+    deployment_task: os_patch_and_upgrade.yml
+  vars_files:
+    - ../environments/vault.yml
 
 - hosts:
     - clustermanager

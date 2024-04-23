@@ -1,6 +1,54 @@
 ---
+- name: Run splunk version command to check currently installed version
+  include_tasks: check_splunk_version.yml
+
+- name: Setting clustering mode based on Splunk version number
+  set_fact:
+    cm_meta_name: "{{ 'master_uri' if splunk_version_release is version('8.1', '<') else 'manager_uri' }}"
+
+- name: Set config_options to an empty dictionary
+  set_fact:
+    config_options: {}
+    
+- name: Project Idempotent | Define configuration options and their desired values
+  set_fact:
+    config_options: >-
+      {{
+        config_options | default({}) | combine({
+          'mode': { 'expected_value': 'searchhead', 'current_value': None },
+          cm_meta_name: { 'expected_value': splunk_uri_cm, 'current_value': None },
+          'pass4SymmKey': { 'expected_value': splunk_idxc_key, 'current_value': None, 'splunk_encrypted_variable': true }
+        })
+      }}
+
+- name: Include task to check and compare current configuration values
+  include_tasks: check_splunk_configuration_value.yml
+  loop: "{{ config_options | dict2items }}"
+  loop_control:
+    loop_var: config_item
+  vars:
+    write_result_to_config_options: true
+    req_secret_conf: server
+    req_secret_section: clustering
+
+- name: print config_options after fetching
+  debug:
+    msg: "{{ config_options }}"
+
+- name: Initialize re_initialization_required to false
+  set_fact:
+    re_initialization_required: false
+
+- name: Check if re-initialization is required based on diff in config_options
+  set_fact:
+    re_initialization_required: true
+  when: (item.value.expected_value | string) != (item.value.current_value | string)
+  loop: "{{ config_options | dict2items }}"
+  loop_control:
+    label: "{{ item.key }}"
+
 - name: Configure search head to join indexer cluster
-  command: "{{ splunk_home }}/bin/splunk edit cluster-config -mode searchhead -master_uri {{ splunk_uri_cm }} -secret {{ splunk_idxc_key }} -auth {{ splunk_auth }}"
+  command: "{{ splunk_home }}/bin/splunk edit cluster-config -mode searchhead -{{ cm_meta_name }} {{ splunk_uri_cm }} -secret {{ splunk_idxc_key }} -auth {{ splunk_auth }}"
   become: true
   become_user: "{{ splunk_nix_user }}"
   register: idxc_sh_join_result
@@ -11,3 +59,4 @@
   until: idxc_sh_join_result.rc == 0
   retries: 6
   delay: 5
+  when: re_initialization_required

@@ -1,0 +1,13 @@
+---
+- name: "Fix optimistic file lock on docker containers"
+  lineinfile:
+    dest: "{{ splunk_home }}/etc/splunk-launch.conf"
+    state: present
+    insertafter: EOF
+    line: "OPTIMISTIC_ABOUT_FILE_LOCKING = 1"
+    owner: "{{ splunk_nix_user }}"
+    group: "{{ splunk_nix_user }}"
+    mode: 0440
+  become: true
+  # when: ansible_virtualization_type == 'docker' # or any other container type. Dependent on gather_facts
+

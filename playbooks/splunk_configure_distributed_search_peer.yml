@@ -1,0 +1,10 @@
+---
+## make all hosts search peers of monitoring console
+- hosts:
+    - monitoringconsole
+  roles:
+    - ../roles/splunk
+  vars:
+    deployment_task: configure_distributed_search_peer.yml
+  vars_files:
+    - ../environments/vault.yml

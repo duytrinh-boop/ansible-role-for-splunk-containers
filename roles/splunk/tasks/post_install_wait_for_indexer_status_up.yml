@@ -1,0 +1,21 @@
+---
+
+- name: "Wait for indexer-status to become green"
+  uri:
+    url: "https://{{ item if (item | regex_search(company_domain_fqdn | regex_escape)) else item + '.' + company_domain_fqdn }}:8089/services/server/health/splunkd/details?output_mode=json"
+    user: "{{ splunk_admin_username }}"
+    password: "{{ splunk_admin_password }}"
+    validate_certs: no
+    return_content: yes
+  delegate_to: "{{ groups['clustermanager'] | first }}"
+  debugger: on_failed
+  register: response
+  retries: 100
+  timeout: 10
+  delay: 10
+  until: 
+    - response.json is defined
+    - 'response.json.entry[0].content.features["Indexer Clustering"].features["Data Durability"].health == "green"'
+    - 'response.json.entry[0].content.features["Indexer Clustering"].features["Indexing Ready"].health == "green"'
+  with_items:
+    - "{{ groups['clustermanager'] | first }}"

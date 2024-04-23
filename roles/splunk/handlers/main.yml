@@ -95,3 +95,7 @@
 - name: reload firewalld
   command: firewall-cmd --reload
   become: true
+
+# referencing to new task due to needing a block
+- name: "Reboot after patching"
+  include_tasks: tasks/os_patch_and_upgrade_reboot_handler.yml

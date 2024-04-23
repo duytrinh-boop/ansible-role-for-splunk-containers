@@ -1,0 +1,36 @@
+# ---
+- name: Check current configuration value for "{{ config_item.key }}"
+  shell: >
+    {{ splunk_home }}/bin/splunk btool {{ req_secret_conf }} list {{ req_secret_section }}
+    | grep -E '^{{ config_item.key }} = '
+    | awk -F ' = ' '{print $2}'
+  register: current_config_value
+  become: true
+  become_user: "{{ splunk_nix_user }}"
+  changed_when: false
+  check_mode: false
+  no_log: true
+
+- name: "Decrypt {{ config_item.key }} of {{ req_secret_conf }}.conf [{{ req_secret_section }}]"
+  shell: "{{ splunk_home }}/bin/splunk show-decrypted --value '{{ current_config_value.stdout }}'"
+  register: decrypted_value
+  become: true
+  no_log: false
+  ignore_errors: true
+  changed_when: false
+  check_mode: false
+  when: config_item.value.splunk_encrypted_variable | default(false)
+
+# - name: Print current config value
+#   debug:
+#     msg: "{{ decrypted_value if decrypted_value.stdout is defined else current_config_value }}"
+
+- name: Update config_options with the current value
+  set_fact:
+    config_options: >-
+      {{ config_options | combine({config_item.key: 
+      { 'expected_value': config_item.value.expected_value, 
+      'current_value': (decrypted_value.stdout if decrypted_value.stdout is defined 
+      else current_config_value.stdout) }}) }}
+  when: 
+    - write_result_to_config_options | default(false)

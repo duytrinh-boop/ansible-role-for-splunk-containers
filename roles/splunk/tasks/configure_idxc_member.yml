@@ -8,10 +8,59 @@
 # https://docs.splunk.com/Documentation/Splunk/8.0.9/Indexer/ConfigurepeerswithCLI
 - name: Setting clustering mode based on Splunk version number
   set_fact:
-    mode_value: "{% if splunk_version_release | float < 8.1 %}slave{% else %}peer{% endif %}"
+    mode_value: "{{ 'slave' if splunk_version_release is version('8.1', '<') else 'peer' }}"
+    cm_meta_name: "{{ 'master_uri' if splunk_version_release is version('8.1', '<') else 'manager_uri' }}"
+
+# - name: Project Idempotent | Define configuration options and their desired values
+#   set_fact:
+#     config_options:
+#       mode: { expected_value: "{{ mode_value}}", current_value: null }
+#       "{{ cm_meta_name }}": { expected_value: "{{ splunk_uri_cm }}", current_value: null }
+#       pass4SymmKey: { expected_value: "{{ splunk_idxc_key }}", current_value: null, splunk_encrypted_variable: true }
+
+- name: Set config_options to an empty dictionary
+  set_fact:
+    config_options: {}
+
+- name: Project Idempotent | Define configuration options and their desired values
+  set_fact:
+    config_options: >-
+      {{
+        config_options | default({}) | combine({
+          'mode': { 'expected_value': mode_value, 'current_value': None },
+          cm_meta_name: { 'expected_value': splunk_uri_cm, 'current_value': None },
+          'pass4SymmKey': { 'expected_value': splunk_idxc_key, 'current_value': None, 'splunk_encrypted_variable': true }
+        })
+      }}
+
+- name: Include task to check and compare current configuration values
+  include_tasks: check_splunk_configuration_value.yml
+  loop: "{{ config_options | dict2items }}"
+  loop_control:
+    loop_var: config_item
+  vars:
+    write_result_to_config_options: true
+    req_secret_conf: server
+    req_secret_section: clustering
+
+- name: print config_options after fetching
+  debug:
+    msg: "{{ config_options }}"
+
+- name: Initialize re_initialization_required to false
+  set_fact:
+    re_initialization_required: false
+
+- name: Check if re-initialization is required based on diff in config_options
+  set_fact:
+    re_initialization_required: true
+  when: (item.value.expected_value | string) != (item.value.current_value | string)
+  loop: "{{ config_options | dict2items }}"
+  loop_control:
+    label: "{{ item.key }}"
 
 - name: Configure idxc member
-  command: "{{ splunk_home }}/bin/splunk edit cluster-config -mode {{ mode_value }} -auth {{ splunk_auth }} -master_uri {{ splunk_uri_cm }} -replication_port {{ splunk_idxc_rep_port }} -secret {{ splunk_idxc_key }}"
+  command: "{{ splunk_home }}/bin/splunk edit cluster-config -mode {{ mode_value }} -auth {{ splunk_auth }} -{{ cm_meta_name }} {{ splunk_uri_cm }} -replication_port {{ splunk_idxc_rep_port }} -secret {{ splunk_idxc_key }}"
   become: true
   become_user: "{{ splunk_nix_user }}"
   register: idxc_peer_init_result
@@ -22,3 +71,4 @@
   until: idxc_peer_init_result.rc == 0
   retries: 6
   delay: 5
+  when: re_initialization_required
