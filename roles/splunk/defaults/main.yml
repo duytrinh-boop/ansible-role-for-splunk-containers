@@ -95,3 +95,4 @@ splunk_firewall_ports: # List of ports to allow through local firewall in dict f
 
 patch_auto_restart_services: True # whether or not to restart services automatically, when patching the operating system.
 patch_automatically_reboot_server: True # If true, server will automatically reboot if necessary after patching operating system.
+outputs_tcpout_default_group_name: default-autolb-group

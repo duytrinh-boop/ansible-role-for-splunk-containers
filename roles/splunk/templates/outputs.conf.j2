@@ -1,0 +1,15 @@
+# https://docs.splunk.com/Documentation/Splunk/latest/Indexer/Forwardmanagerdata
+# this outputs.conf forwards logs to indexer layer
+# meant to be deployed on search heads, and management nodes such as DS, CM, SHC-Dep, and so on.
+
+# Turn off indexing on the manager node
+[indexAndForward]
+index = false
+
+[tcpout]
+defaultGroup = {{ outputs_tcpout_default_group_name }}
+forwardedindex.filter.disable = true
+indexAndForward = false
+
+[tcpout:{{ outputs_tcpout_default_group_name }}]
+server={{ indexer_servers }}

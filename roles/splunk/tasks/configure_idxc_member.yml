@@ -72,3 +72,6 @@
   retries: 6
   delay: 5
   when: re_initialization_required
+
+- name: Enable inputs port on indexer
+  include_tasks: configure_idx_enable_receiver.yml

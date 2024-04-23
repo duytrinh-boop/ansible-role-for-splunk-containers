@@ -1,0 +1,14 @@
+---
+- name: Define indexer servers
+  set_fact:
+    indexer_servers: "{{ groups['indexer'] | map('regex_replace', '^(.*)$', '\\1:9997') | join(',') }}"
+
+- name: Create outputs.conf to forward logs to indexer layer
+  template:
+    src: "outputs.conf.j2"
+    dest: "{{ splunk_home }}/etc/system/local/outputs.conf"
+    owner: "{{ splunk_nix_user }}"
+    group: "{{ splunk_nix_group }}"
+    mode: 0644
+  become: true
+  notify: restart splunk

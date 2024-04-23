@@ -30,6 +30,15 @@
   vars_files:
     - ../environments/vault.yml
 
+- hosts:
+    - nonidxcluster 
+  roles:
+  - ../roles/splunk
+  vars:
+    deployment_task: configure_forward_logs_indexer_layer.yml
+  vars_files:
+    - ../environments/vault.yml
+
 # we are not including search head cluster servers here. They have their own playbook splunk_shc_deploy.yml
 - hosts:
     # - monitoringconsole
