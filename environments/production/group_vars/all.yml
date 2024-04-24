@@ -1,7 +1,24 @@
 ---
-splunk_uri_lm: https://my_license_master:8089
-ansible_user: my_ansible_ssh_user
-ansible_ssh_private_key_file: ~/.ssh/my_ansible_ssh.key
-git_server: ssh://git@mygithost:1234
-git_key: ~/.ssh/my-git-key
-git_project: SOMEPROJECT
+splunk_uri_lm: "https://{{ groups['licensemaster'] | first }}:8089" # need to get in list
+splunk_license_group: Enterprise
+license_files_dir_path: "{{ role_path }}/files/splunk_licenses"
+license_file_name: "Splunk.License"
+license_file_path: "{{ license_file_dir }}/{{ license_file_name }}"
+#splunk_uri_cm: https://new_CM1.tintin.website:8089
+splunk_uri_cm: https://{{ groups['clustermanager'] | first }}:8089
+
+
+splunk_admin_username: admin
+splunk_admin_password: "{{ vault_splunk_admin_password }}"
+
+
+# IDXC Vars
+splunk_idxc_key: "{{ vault_splunk_idxc_key }}"
+splunk_idxc_rf: 2
+splunk_idxc_sf: 2
+splunk_idxc_label: myidxc
+
+# SHC Vars
+splunk_shc_key: "{{ vault_splunk_shc_key }}"
+splunk_shc_label: myshc
+splunk_shc_uri_list: "{% for h in groups[splunk_shc_target_group] %}https://{{ hostvars[h].inventory_hostname }}:{{ splunkd_port }}{% if not loop.last %},{% endif %}{% endfor %}" # If you manage multiple SHCs, configure the var value in group_vars
