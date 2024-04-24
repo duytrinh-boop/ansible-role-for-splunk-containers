@@ -7,6 +7,9 @@ license_file_path: "{{ license_file_dir }}/{{ license_file_name }}"
 #splunk_uri_cm: https://new_CM1.tintin.website:8089
 splunk_uri_cm: https://{{ groups['clustermanager'] | first }}:8089
 
+# get package version and build_id from view-source:https://www.splunk.com/en_us/download/splunk-enterprise.html
+splunk_package_version: 9.2.1 
+build_id: 78803f08aabb
 
 splunk_admin_username: admin
 splunk_admin_password: "{{ vault_splunk_admin_password }}"
