@@ -8,4 +8,5 @@
     mode: 0644
     owner: "{{ splunk_nix_user }}"
     group: "{{ splunk_nix_group }}"
+  become: true
   notify: restart splunk
