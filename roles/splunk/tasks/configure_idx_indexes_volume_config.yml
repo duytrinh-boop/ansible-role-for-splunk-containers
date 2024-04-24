@@ -1,0 +1,45 @@
+---
+- name: Check if hot volume mount exists
+  stat:
+    path: "{{ indexers_volume_hot_path }}"
+  register: hot_volume_stat
+
+- name: Check if cold volume mount exists
+  stat:
+    path: "{{ indexers_volume_cold_path }}"
+  register: cold_volume_stat
+
+- name: Fail if mounts do not exist and single_volume_for_hot_and_cold is False
+  fail:
+    msg: | 
+      "Required volume mounts do not exist.
+      Verify that hot_path exists: {{ indexers_volume_hot_path }}
+      Verify that cold_path exists: {{ indexers_volume_cold_path }}"
+  when: not single_volume_for_hot_and_cold and (not hot_volume_stat.stat.exists or not cold_volume_stat.stat.exists)
+
+
+- name: Set ownership and permissions on hot volume
+  file:
+    path: "{{ indexers_volume_hot_path }}"
+    owner: "{{ splunk_nix_user }}"
+    group: "{{ splunk_nix_group }}"
+    mode: '0750'
+  when: not single_volume_for_hot_and_cold and hot_volume_stat.stat.exists
+
+- name: Set ownership and permissions on cold volume
+  file:
+    path: "{{ indexers_volume_cold_path }}"
+    owner: "{{ splunk_nix_user }}"
+    group: "{{ splunk_nix_group }}"
+    mode: '0750'
+  when: not single_volume_for_hot_and_cold and cold_volume_stat.stat.exists
+
+- name: "Create indexes.conf on indexers: specifying volume settings."
+  template:
+    src: "indexes.conf.j2"
+    dest: "{{ splunk_home }}/etc/system/local/indexes.conf"
+    owner: "{{ splunk_nix_user }}"
+    group: "{{ splunk_nix_group }}"
+    mode: 0644
+  become: true
+  notify: restart splunk

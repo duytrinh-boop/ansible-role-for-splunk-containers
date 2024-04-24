@@ -75,3 +75,6 @@
 
 - name: Enable inputs port on indexer
   include_tasks: configure_idx_enable_receiver.yml
+
+- name: Configure volume settings for indexes
+  include_tasks: configure_idx_indexes_volume_config.yml

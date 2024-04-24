@@ -25,3 +25,11 @@ splunk_idxc_label: tos_spl_index_cluster
 splunk_shc_key: "{{ vault_splunk_shc_key }}"
 splunk_shc_label: tos_spl_sh_cluster
 splunk_shc_uri_list: "{% for h in groups[splunk_shc_target_group] %}https://{{ hostvars[h].inventory_hostname }}:{{ splunkd_port }}{% if not loop.last %},{% endif %}{% endfor %}" # If you manage multiple SHCs, configure the var value in group_vars
+
+# INDEXER volume settings
+single_volume_for_hot_and_cold: False # we will have separate volumes for hot and cold, and frozen
+indexers_volume_hot_path: /splunk-hot
+indexers_volume_hot_maxMB: 5859500 # ~ approx 5780 GB minus 1% in MB
+
+indexers_volume_cold_path: /splunk-cold
+indexers_volume_cold_maxMB: 52445860 # ~ 51,734 GB minus 1%, in MB

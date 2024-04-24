@@ -1,0 +1,147 @@
+### THESE SETTINGS WILL BE PLACED ON INDEXERS, UNDER /system/local/indexes.conf
+### HOWEVER, they can be overwritten by placing apps in /peer-apps/<app>,
+### https://docs.splunk.com/Documentation/Splunk/9.2.1/Admin/Wheretofindtheconfigurationfiles#Summary_of_the_effect_of_directories_on_configuration_precedence
+
+
+# VOLUME SETTINGS
+# In this example, the volume spec here is set to the indexer-specific
+# path for data storage. It satisfies the "volume:primary" tag used in
+# the indexes.conf which is shared between SH and indexers. 
+# See also: org_full_indexes
+
+
+{% if single_volume_for_hot_and_cold %}
+# One Volume for Hot and Cold
+[volume:single]
+path = {{ single_volume_path | default('/opt/splunk/var/lib/splunk') }}
+
+
+# This setting changes the storage location for _splunk_summaries, 
+# which should be utilized if you want to use the same partition
+# as specified for volume settings. Otherwise defaults to $SPLUNK_DB.
+#
+# The size setting of the volume shown below would place a limit on the
+# total size of data model acceleration (DMA) data. Doing so should be
+# carefully considered as it may have a negative impact on appilcations
+# like Enterprise Security.
+#
+[volume:_splunk_summaries]
+path = {{ single_volume_path | default('/opt/splunk/var/lib/splunk') }}
+# ~ 100GB
+# maxVolumeDataSizeMB = 100000
+{% else %}
+# Separate Volume for Hot and Cold
+[volume:hot]
+path = {{ indexers_volume_hot_path }}
+# Note: The *only* reason to use a volume is to set a cumulative size-based
+# limit across several indexes stored on the same partition. There are *not*
+# time-based volume limits.
+maxVolumeDataSizeMB = {{ indexers_volume_hot_maxMB }}
+
+[volume:cold]
+path = {{ indexers_volume_cold_path }}
+maxVolumeDataSizeMB = {{ indexers_volume_cold_maxMB }}
+
+# This setting changes the storage location for _splunk_summaries, 
+# which should be utilized if you want to use the same partition
+# as specified for volume settings. Otherwise defaults to $SPLUNK_DB.
+#
+# The size setting of the volume shown below would place a limit on the
+# total size of data model acceleration (DMA) data. Doing so should be
+# carefully considered as it may have a negative impact on appilcations
+# like Enterprise Security.
+#
+[volume:_splunk_summaries]
+path = {{ indexers_volume_hot_path | default('/opt/splunk/var/lib/splunk') }}
+# ~ 100GB
+# maxVolumeDataSizeMB = 100000
+{% endif %}
+
+# END VOLUME SETTINGS
+##################################################################################
+##################################################################################
+##################################################################################
+
+# START DEFAULT INDEXES SETTINGS
+{% if single_volume_for_hot_and_cold %}
+{% set volume_hot = "volume:single" %}
+{% set volume_cold = "volume:single" %}
+{% else %}
+{% set volume_hot = "volume:hot" %}
+{% set volume_cold = "volume:cold" %}
+{% endif %}
+
+[default]
+homePath = {{ volume_hot }}/$_index_name/db
+coldPath = {{ volume_cold }}/$_index_name/colddb
+#thawedPath * An absolute path that contains the thawed (resurrected) databases for the index.* CANNOT contain a volume reference.
+thawedPath = $SPLUNK_DB/$_index_name/thaweddb
+summaryHomePath = {{ volume_hot }}/$_index_name/summary
+repFactor = auto
+
+# SPLUNK INDEXES
+# Note, many of these use historical directory names which don't match the
+# name of the index. A common mistake is to automatically generate a new
+# indexes.conf from the existing names, thereby "losing" (hiding from Splunk)
+# the existing data.
+[main]
+homePath   = {{ volume_hot }}/defaultdb/db
+coldPath   = {{ volume_cold }}/defaultdb/colddb
+thawedPath = $SPLUNK_DB/defaultdb/thaweddb
+
+[history]
+homePath   = {{ volume_hot }}/historydb/db
+coldPath   = {{ volume_cold }}/historydb/colddb
+thawedPath = $SPLUNK_DB/historydb/thaweddb
+
+[summary]
+homePath   = {{ volume_hot }}/summarydb/db
+coldPath   = {{ volume_cold }}/summarydb/colddb
+thawedPath = $SPLUNK_DB/summarydb/thaweddb
+
+[_internal]
+homePath   = {{ volume_hot }}/_internaldb/db
+coldPath   = {{ volume_cold }}/_internaldb/colddb
+thawedPath = $SPLUNK_DB/_internaldb/thaweddb
+
+# For version 6.1 and higher
+[_introspection]
+homePath   = {{ volume_hot }}/_introspection/db
+coldPath   = {{ volume_cold }}/_introspection/colddb
+thawedPath = $SPLUNK_DB/_introspection/thaweddb
+
+# For version 6.5 and higher
+[_telemetry]
+homePath   = {{ volume_hot }}/_telemetry/db
+coldPath   = {{ volume_cold }}/_telemetry/colddb
+thawedPath = $SPLUNK_DB/_telemetry/thaweddb
+
+[_audit]
+homePath   = {{ volume_hot }}/audit/db
+coldPath   = {{ volume_cold }}/audit/colddb
+thawedPath = $SPLUNK_DB/audit/thaweddb
+
+[_thefishbucket]
+homePath   = {{ volume_hot }}/fishbucket/db
+coldPath   = {{ volume_cold }}/fishbucket/colddb
+thawedPath = $SPLUNK_DB/fishbucket/thaweddb
+
+# For version 8.0 and higher
+[_metrics]
+homePath   = {{ volume_hot }}/_metrics/db
+coldPath   = {{ volume_cold }}/_metrics/colddb
+thawedPath = $SPLUNK_DB/_metrics/thaweddb
+datatype = metric
+
+# For version 8.0.4 and higher
+[_metrics_rollup]
+homePath   = {{ volume_hot }}/_metrics_rollup/db
+coldPath   = {{ volume_cold }}/_metrics_rollup/colddb
+thawedPath = $SPLUNK_DB/_metrics_rollup/thaweddb
+datatype = metric
+
+[_configtracker]
+homePath   = {{ volume_hot }}/_configtracker/db
+coldPath   = {{ volume_cold }}/_configtracker/colddb
+thawedPath = $SPLUNK_DB/_configtracker/thaweddb
+frozenTimePeriodInSecs = 2592000
