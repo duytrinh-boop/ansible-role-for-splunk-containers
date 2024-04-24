@@ -43,9 +43,9 @@
     req_secret_conf: server
     req_secret_section: clustering
 
-- name: print config_options after fetching
-  debug:
-    msg: "{{ config_options }}"
+# - name: print config_options after fetching
+#   debug:
+#     msg: "{{ config_options }}"
 
 - name: Initialize re_initialization_required to false
   set_fact:
