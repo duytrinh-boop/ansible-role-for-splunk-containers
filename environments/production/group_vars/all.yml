@@ -28,7 +28,7 @@ splunk_shc_uri_list: "{% for h in groups[splunk_shc_target_group] %}https://{{ h
 
 # INDEXER volume settings
 single_volume_for_hot_and_cold: False # we will have separate volumes for hot and cold, and frozen
-indexers_volume_hot_path: /splunk-hot
+indexers_volume_hot_path: /splunk-hotwarm
 indexers_volume_hot_maxMB: 5859500 # ~ approx 5780 GB minus 1% in MB
 
 indexers_volume_cold_path: /splunk-cold
