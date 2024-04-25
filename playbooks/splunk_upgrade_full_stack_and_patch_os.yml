@@ -54,7 +54,7 @@
 
 - hosts:
     - search
-  serial: 50
+  serial: 1
   become: yes
   any_errors_fatal: true
   max_fail_percentage: 0
@@ -67,7 +67,7 @@
 
 - hosts:
     - search
-  serial: 50
+  serial: 1
   become: yes
   any_errors_fatal: true
   max_fail_percentage: 0
@@ -77,6 +77,33 @@
     deployment_task: os_patch_and_upgrade.yml
   vars_files:
     - ../environments/vault.yml
+
+- hosts:
+    - shc
+  serial: 1
+  become: yes
+  any_errors_fatal: true
+  max_fail_percentage: 0
+  roles:
+    - ../roles/splunk
+  vars:
+    deployment_task: check_splunk.yml
+  vars_files:
+    - ../environments/vault.yml
+
+- hosts:
+    - shc
+  serial: 1
+  become: yes
+  any_errors_fatal: true
+  max_fail_percentage: 0
+  roles:
+    - ../roles/splunk
+  vars:
+    deployment_task: os_patch_and_upgrade.yml
+  vars_files:
+    - ../environments/vault.yml
+
 
 - hosts:
     - clustermanager
@@ -94,7 +121,7 @@
 
 - hosts:
     - indexer
-  serial: 100
+  serial: 1
   become: yes
   any_errors_fatal: true
   max_fail_percentage: 0
@@ -108,7 +135,7 @@
 
 - hosts:
     - indexer
-  serial: 100
+  serial: 1
   become: yes
   any_errors_fatal: true
   max_fail_percentage: 0

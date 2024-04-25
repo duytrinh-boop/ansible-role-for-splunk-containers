@@ -30,7 +30,7 @@
 
 - hosts:
     - search
-  serial: 50
+  serial: 1
   become: yes
   any_errors_fatal: true
   max_fail_percentage: 0
@@ -58,7 +58,7 @@
 
 - hosts:
     - indexer
-  serial: 100
+  serial: 1
   become: yes
   any_errors_fatal: true
   max_fail_percentage: 0
