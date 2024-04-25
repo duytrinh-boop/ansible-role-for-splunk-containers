@@ -24,6 +24,7 @@
     owner: "{{ splunk_nix_user }}"
     group: "{{ splunk_nix_group }}"
     mode: '0750'
+  become: true
   when: not single_volume_for_hot_and_cold and hot_volume_stat.stat.exists
 
 - name: Set ownership and permissions on cold volume
@@ -32,6 +33,7 @@
     owner: "{{ splunk_nix_user }}"
     group: "{{ splunk_nix_group }}"
     mode: '0750'
+  become: true
   when: not single_volume_for_hot_and_cold and cold_volume_stat.stat.exists
 
 - name: "Create indexes.conf on indexers: specifying volume settings."
