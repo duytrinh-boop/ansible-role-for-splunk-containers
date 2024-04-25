@@ -2,7 +2,7 @@
 
 - name: "Wait for indexer-status to become green"
   uri:
-    url: "https://{{ item if (item | regex_search(company_domain_fqdn | regex_escape)) else item + '.' + company_domain_fqdn }}:8089/services/server/health/splunkd/details?output_mode=json"
+    url: "https://{{ item }}:8089/services/server/health/splunkd/details?output_mode=json"
     user: "{{ splunk_admin_username }}"
     password: "{{ splunk_admin_password }}"
     validate_certs: no
