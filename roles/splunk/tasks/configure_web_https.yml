@@ -1,22 +1,7 @@
 ---
-- name: Configure HTTPS and custom login message for Splunk Web
-  ini_file:
-    path: "{{ splunk_home }}/etc/system/local/web.conf"
-    section: "settings"
-    option: "{{ item.option }}"
-    value: "{{ item.value }}"
-    mode: 0644
-    owner: "{{ splunk_nix_user }}"
-    group: "{{ splunk_nix_group }}"
-  loop:
-    - { option: "enableSplunkWebSSL", value: "true" }
-    - { option: "login_content", value: "{{ group_names[0] }} - {{ inventory_hostname }}" }
-  become: true
-  notify: restart splunk
-
 - name: Determine the background color based on group membership
   set_fact:
-    banner_details: "{{ group_details[item] }}"
+    group_info: "{{ group_details[item] }}"
   when: inventory_hostname in groups[item]
   with_items: "{{ group_details.keys() }}"
   vars:
@@ -31,6 +16,21 @@
       indexer: { color: "red", friendly_group_name: "Indexer" }
       # we have purposefully ignored shc members, as they'll have a designated loadbalanced dns name
 
+- name: Configure HTTPS and custom login message for Splunk Web
+  ini_file:
+    path: "{{ splunk_home }}/etc/system/local/web.conf"
+    section: "settings"
+    option: "{{ item.option }}"
+    value: "{{ item.value }}"
+    mode: 0644
+    owner: "{{ splunk_nix_user }}"
+    group: "{{ splunk_nix_group }}"
+  loop:
+    - { option: "enableSplunkWebSSL", value: "true" }
+    - { option: "login_content", value: "{{ (group_info.friendly_group_name | default('') + ' - ') if group_info.friendly_group_name is defined else '' }}{{ inventory_hostname }}" }
+  become: true
+  notify: restart splunk
+
 - name: Ensure global banner settings are configured
   ini_file:
     path: "{{ splunk_home }}/etc/system/local/global-banner.conf"
@@ -41,6 +41,6 @@
   notify: restart splunk
   loop:
     - { option: "global_banner.visible", value: "true" }
-    - { option: "global_banner.message", value: "{{ banner_details.friendly_group_name }}: {{ inventory_hostname }}" }
-    - { option: "global_banner.background_color", value: "{{ banner_details.color }}" }
-  when: banner_details is defined
+    - { option: "global_banner.message", value: "{{ group_info.friendly_group_name }}: {{ inventory_hostname }}" }
+    - { option: "global_banner.background_color", value: "{{ group_info.color }}" }
+  when: group_info is defined
