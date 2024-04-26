@@ -38,6 +38,7 @@
     option: "{{ item.option }}"
     value: "{{ item.value }}"
     no_extra_spaces: yes
+  notify: restart splunk
   loop:
     - { option: "global_banner.visible", value: "true" }
     - { option: "global_banner.message", value: "{{ group_names[0] }} - {{ inventory_hostname }}" }
