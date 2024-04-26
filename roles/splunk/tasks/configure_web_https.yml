@@ -1,12 +1,45 @@
 ---
-- name: Turn on HTTPS encryption for Splunk Web using the web.conf
+- name: Configure HTTPS and custom login message for Splunk Web
   ini_file:
     path: "{{ splunk_home }}/etc/system/local/web.conf"
     section: "settings"
-    option: "enableSplunkWebSSL"
-    value: "true"
+    option: "{{ item.option }}"
+    value: "{{ item.value }}"
     mode: 0644
     owner: "{{ splunk_nix_user }}"
     group: "{{ splunk_nix_group }}"
+  loop:
+    - { option: "enableSplunkWebSSL", value: "true" }
+    - { option: "login_content", value: "{{ group_names[0] }} - {{ inventory_hostname }}" }
   become: true
   notify: restart splunk
+
+- name: Determine the background color based on group membership
+  set_fact:
+    banner_color: "{{ background_colors[item] }}"
+  when: inventory_hostname in groups[item]
+  with_items: "{{ background_colors.keys() }}"
+  vars:
+    background_colors: # global_banner.background_color = [green|blue|yellow|orange|red]
+      clustermanager: "yellow"
+      licensemaster: "yellow"
+      monitoringconsole: "yellow"
+      deploymentserver: "orange"
+      shdeployer: "red"
+      search: "green"
+      hf: "blue"
+      indexer: "red"
+      # we have purposefully ignored shc members, as they'll have a designated loadbalanced dns name
+
+- name: Ensure global banner settings are configured
+  ini_file:
+    path: "{{ splunk_home }}/etc/system/local/global-banner.conf"
+    section: BANNER_MESSAGE_SINGLETON
+    option: "{{ item.option }}"
+    value: "{{ item.value }}"
+    no_extra_spaces: yes
+  loop:
+    - { option: "global_banner.visible", value: "true" }
+    - { option: "global_banner.message", value: "{{ group_names[0] }} - {{ inventory_hostname }}" }
+    - { option: "global_banner.background_color", value: "{{ banner_color }}" }
+  when: banner_color is defined
