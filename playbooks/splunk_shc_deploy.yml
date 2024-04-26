@@ -10,6 +10,15 @@
   vars_files:
     - ../environments/vault.yml
 
+- hosts:
+    - shdeployer
+    - shc
+  roles:
+  - ../roles/splunk
+  vars:
+    deployment_task: configure_forward_logs_indexer_layer.yml
+  vars_files:
+    - ../environments/vault.yml
 
 - hosts:
     - shdeployer
