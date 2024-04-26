@@ -16,19 +16,19 @@
 
 - name: Determine the background color based on group membership
   set_fact:
-    banner_color: "{{ background_colors[item] }}"
+    banner_details: "{{ group_details[item] }}"
   when: inventory_hostname in groups[item]
-  with_items: "{{ background_colors.keys() }}"
+  with_items: "{{ group_details.keys() }}"
   vars:
-    background_colors: # global_banner.background_color = [green|blue|yellow|orange|red]
-      clustermanager: "yellow"
-      licensemaster: "yellow"
-      monitoringconsole: "yellow"
-      deploymentserver: "orange"
-      shdeployer: "red"
-      search: "green"
-      hf: "blue"
-      indexer: "red"
+    group_details:
+      clustermanager: { color: "yellow", friendly_group_name: "Cluster Manager" }
+      # licensemaster: { color: "yellow", friendly_group_name: "License Master" } # uncomment if this is a designated server
+      # monitoringconsole: { color: "yellow", friendly_group_name: "Monitoring Console" } # uncomment if this is a designated server
+      deploymentserver: { color: "orange", friendly_group_name: "Deployment Server" }
+      shdeployer: { color: "red", friendly_group_name: "SH Cluster Deployer" }
+      search: { color: "green", friendly_group_name: "Standalone Search Head" }
+      hf: { color: "blue", friendly_group_name: "Heavy Forwarder" }
+      indexer: { color: "red", friendly_group_name: "Indexer" }
       # we have purposefully ignored shc members, as they'll have a designated loadbalanced dns name
 
 - name: Ensure global banner settings are configured
@@ -41,6 +41,6 @@
   notify: restart splunk
   loop:
     - { option: "global_banner.visible", value: "true" }
-    - { option: "global_banner.message", value: "{{ group_names[0] }} - {{ inventory_hostname }}" }
-    - { option: "global_banner.background_color", value: "{{ banner_color }}" }
-  when: banner_color is defined
+    - { option: "global_banner.message", value: "{{ banner_details.friendly_group_name }}: {{ inventory_hostname }}" }
+    - { option: "global_banner.background_color", value: "{{ banner_details.color }}" }
+  when: banner_details is defined
