@@ -8,21 +8,11 @@
   roles:
     - ../roles/splunk
   vars:
-    deployment_task: check_splunk.yml
+    deployment_task: linux_configure_fqdn.yml
+    domain: ksat.site
   vars_files:
     - ../environments/vault.yml
 
-- hosts:
-    - clustermanager
-  become: true
-  any_errors_fatal: true
-  max_fail_percentage: 0
-  roles:
-    - ../roles/splunk
-  vars:
-    deployment_task: os_patch_and_upgrade.yml
-  vars_files:
-    - ../environments/vault.yml
 
 - hosts:
     - licensemaster
@@ -34,23 +24,11 @@
   roles:
     - ../roles/splunk
   vars:
-    deployment_task: check_splunk.yml
+    deployment_task: linux_configure_fqdn.yml
+    domain: ksat.site
   vars_files:
     - ../environments/vault.yml
 
-- hosts:
-    - licensemaster
-    - shdeployer
-    - deploymentserver
-  become: true
-  any_errors_fatal: true
-  max_fail_percentage: 0
-  roles:
-    - ../roles/splunk
-  vars:
-    deployment_task: os_patch_and_upgrade.yml
-  vars_files:
-    - ../environments/vault.yml
 
 - hosts:
     - search
@@ -61,33 +39,8 @@
   roles:
     - ../roles/splunk
   vars:
-    deployment_task: check_splunk.yml
-  vars_files:
-    - ../environments/vault.yml
-
-- hosts:
-    - search
-  serial: 1
-  become: true
-  any_errors_fatal: true
-  max_fail_percentage: 0
-  roles:
-    - ../roles/splunk
-  vars:
-    deployment_task: os_patch_and_upgrade.yml
-  vars_files:
-    - ../environments/vault.yml
-
-- hosts:
-    - shc
-  serial: 1
-  become: true
-  any_errors_fatal: true
-  max_fail_percentage: 0
-  roles:
-    - ../roles/splunk
-  vars:
-    deployment_task: check_splunk.yml
+    deployment_task: linux_configure_fqdn.yml
+    domain: ksat.site
   vars_files:
     - ../environments/vault.yml
 
@@ -103,7 +56,6 @@
     deployment_task: os_patch_and_upgrade.yml
   vars_files:
     - ../environments/vault.yml
-
 
 - hosts:
     - clustermanager
@@ -128,23 +80,11 @@
   roles:
     - ../roles/splunk
   vars:
-    deployment_task: check_splunk.yml
+    deployment_task: linux_configure_fqdn.yml
+    domain: ksat.site
   vars_files:
     - ../environments/vault.yml
 
-
-- hosts:
-    - indexer
-  serial: 1
-  become: true
-  any_errors_fatal: true
-  max_fail_percentage: 0
-  roles:
-    - ../roles/splunk
-  vars:
-    deployment_task: os_patch_and_upgrade.yml
-  vars_files:
-    - ../environments/vault.yml
 
 - hosts:
     - clustermanager
