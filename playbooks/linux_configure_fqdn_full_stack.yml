@@ -54,6 +54,7 @@
     - ../roles/splunk
   vars:
     deployment_task: linux_configure_fqdn.yml
+    domain: ksat.site
   vars_files:
     - ../environments/vault.yml
 
