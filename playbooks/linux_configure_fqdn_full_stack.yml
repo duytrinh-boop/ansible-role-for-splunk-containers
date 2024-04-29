@@ -1,0 +1,101 @@
+---
+# Example playbook to properly upgrade a single-site indexer cluster and search head cluster using the splunk role from ansible-role-for-splunk
+- hosts:
+    - clustermanager
+  become: true
+  any_errors_fatal: true
+  max_fail_percentage: 0
+  roles:
+    - ../roles/splunk
+  vars:
+    deployment_task: linux_configure_fqdn.yml
+    domain: ksat.site
+  vars_files:
+    - ../environments/vault.yml
+
+
+- hosts:
+    - licensemaster
+    - shdeployer
+    - deploymentserver
+  become: true
+  any_errors_fatal: true
+  max_fail_percentage: 0
+  roles:
+    - ../roles/splunk
+  vars:
+    deployment_task: linux_configure_fqdn.yml
+    domain: ksat.site
+  vars_files:
+    - ../environments/vault.yml
+
+
+- hosts:
+    - search
+  serial: 1
+  become: true
+  any_errors_fatal: true
+  max_fail_percentage: 0
+  roles:
+    - ../roles/splunk
+  vars:
+    deployment_task: linux_configure_fqdn.yml
+    domain: ksat.site
+  vars_files:
+    - ../environments/vault.yml
+
+- hosts:
+    - shc
+  serial: 1
+  become: true
+  any_errors_fatal: true
+  max_fail_percentage: 0
+  roles:
+    - ../roles/splunk
+  vars:
+    deployment_task: os_patch_and_upgrade.yml
+  vars_files:
+    - ../environments/vault.yml
+
+- hosts:
+    - clustermanager
+  become: true
+  any_errors_fatal: true
+  max_fail_percentage: 0
+  roles:
+    - ../roles/splunk
+  vars:
+    deployment_task: set_maintenance_mode.yml
+    state: enable
+  vars_files:
+    - ../environments/vault.yml
+
+
+- hosts:
+    - indexer
+  serial: 1
+  become: true
+  any_errors_fatal: true
+  max_fail_percentage: 0
+  roles:
+    - ../roles/splunk
+  vars:
+    deployment_task: linux_configure_fqdn.yml
+    domain: ksat.site
+  vars_files:
+    - ../environments/vault.yml
+
+
+- hosts:
+    - clustermanager
+  become: true
+  any_errors_fatal: true
+  max_fail_percentage: 0
+  roles:
+    - ../roles/splunk
+  vars:
+    deployment_task: set_maintenance_mode.yml
+    state: disable
+  vars_files:
+    - ../environments/vault.yml
+
