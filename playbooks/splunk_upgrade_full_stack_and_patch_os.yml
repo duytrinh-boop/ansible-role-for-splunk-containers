@@ -2,7 +2,7 @@
 # Example playbook to properly upgrade a single-site indexer cluster and search head cluster using the splunk role from ansible-role-for-splunk
 - hosts:
     - clustermanager
-  become: yes
+  become: true
   any_errors_fatal: true
   max_fail_percentage: 0
   roles:
@@ -14,7 +14,7 @@
 
 - hosts:
     - clustermanager
-  become: yes
+  become: true
   any_errors_fatal: true
   max_fail_percentage: 0
   roles:
@@ -28,7 +28,7 @@
     - licensemaster
     - shdeployer
     - deploymentserver
-  become: yes
+  become: true
   any_errors_fatal: true
   max_fail_percentage: 0
   roles:
@@ -42,7 +42,7 @@
     - licensemaster
     - shdeployer
     - deploymentserver
-  become: yes
+  become: true
   any_errors_fatal: true
   max_fail_percentage: 0
   roles:
@@ -55,7 +55,7 @@
 - hosts:
     - search
   serial: 1
-  become: yes
+  become: true
   any_errors_fatal: true
   max_fail_percentage: 0
   roles:
@@ -68,7 +68,7 @@
 - hosts:
     - search
   serial: 1
-  become: yes
+  become: true
   any_errors_fatal: true
   max_fail_percentage: 0
   roles:
@@ -81,7 +81,7 @@
 - hosts:
     - shc
   serial: 1
-  become: yes
+  become: true
   any_errors_fatal: true
   max_fail_percentage: 0
   roles:
@@ -94,7 +94,7 @@
 - hosts:
     - shc
   serial: 1
-  become: yes
+  become: true
   any_errors_fatal: true
   max_fail_percentage: 0
   roles:
@@ -107,7 +107,7 @@
 
 - hosts:
     - clustermanager
-  become: yes
+  become: true
   any_errors_fatal: true
   max_fail_percentage: 0
   roles:
@@ -122,7 +122,7 @@
 - hosts:
     - indexer
   serial: 1
-  become: yes
+  become: true
   any_errors_fatal: true
   max_fail_percentage: 0
   roles:
@@ -136,7 +136,7 @@
 - hosts:
     - indexer
   serial: 1
-  become: yes
+  become: true
   any_errors_fatal: true
   max_fail_percentage: 0
   roles:
@@ -148,7 +148,7 @@
 
 - hosts:
     - clustermanager
-  become: yes
+  become: true
   any_errors_fatal: true
   max_fail_percentage: 0
   roles:
