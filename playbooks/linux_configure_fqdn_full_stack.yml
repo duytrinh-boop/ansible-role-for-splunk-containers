@@ -53,7 +53,7 @@
   roles:
     - ../roles/splunk
   vars:
-    deployment_task: os_patch_and_upgrade.yml
+    deployment_task: linux_configure_fqdn.yml
   vars_files:
     - ../environments/vault.yml
 
