@@ -99,3 +99,12 @@
 # referencing to new task due to needing a block
 - name: "Reboot after patching"
   include_tasks: tasks/os_patch_and_upgrade_reboot_handler.yml
+
+- name: Reboot the server
+  reboot:
+    msg: "Rebooting to ensure hostname changes take effect"
+    connect_timeout: 5
+    reboot_timeout: 300
+    pre_reboot_delay: 0
+    post_reboot_delay: 60
+    test_command: uptime
