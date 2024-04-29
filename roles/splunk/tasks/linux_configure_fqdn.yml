@@ -9,10 +9,9 @@
 
 # Configuration Block: If the FQDN does not resolve or resolves correctly (to the server’s IP), the playbook continues with changing the hostname settings and ensures these changes are applied across system services by rebooting.
 ---
-
 - name: Gather facts about the current hostname and default IP
   setup:
-    filter: "ansible_hostname,ansible_default_ipv4"
+    filter: "ansible_hostname,ansible_default_ipv4,ansible_fqdn"
 
 - name: Construct the FQDN
   set_fact:
@@ -26,33 +25,28 @@
 - name: Fail if FQDN already resolves to a different IP
   fail:
     msg: "The FQDN {{ fqdn }} resolves to an IP address that is not the server's IP ({{ ansible_default_ipv4.address }}), aborting to prevent conflicts."
-  when: pre_dns_check.rc == 0 and ansible_default_ipv4.address not in pre_dns_check.stdout
+  when: 
+    - pre_dns_check.rc == 0
+    - ansible_default_ipv4.address not in pre_dns_check.stdout
 
-- name: Continue with configuration as FQDN resolves correctly
-  become: true
-  block:
-    - name: Add an entry to /etc/hosts
-      lineinfile:
-        path: /etc/hosts
-        regexp: '.*{{ ansible_hostname }}$'
-        line: "{{ ansible_default_ipv4.address }} {{ fqdn }} {{ ansible_hostname }}"
-        state: present
+- name: Check if /etc/hosts needs updating
+  lineinfile:
+    path: /etc/hosts
+    regexp: ".*{{ ansible_hostname.split('.')[0] }}$"
+    line: "{{ ansible_default_ipv4.address }} {{ fqdn }} {{ ansible_hostname.split('.')[0] }}"
+    state: present
+  register: hosts_changed
+  notify: Reboot the server
 
-    - name: Set the hostname with hostnamectl to the new FQDN
-      command: hostnamectl set-hostname {{ fqdn }}
+- name: Set the hostname if it does not match the FQDN
+  hostname:
+    name: "{{ ansible_hostname.split('.')[0] }}"
+  when: ansible_hostname != ansible_hostname.split('.')[0]
+  register: hostname_changed
+  notify: Reboot the server
 
-    - name: Verify post-change DNS resolution
-      command: getent hosts {{ fqdn }}
-      register: post_dns_check
-      failed_when: "post_dns_check.stdout == '' or ansible_default_ipv4.address not in post_dns_check.stdout"
-
-    - name: Reboot the machine
-      reboot:
-        msg: "Rebooting to apply hostname changes"
-        connect_timeout: 5
-        reboot_timeout: 300
-        pre_reboot_delay: 0
-        post_reboot_delay: 60
-        test_command: uptime
-
-  when: pre_dns_check.rc != 0 or ansible_default_ipv4.address in pre_dns_check.stdout
+- name: Verify that the FQDN resolves to the correct IP address
+  command: getent hosts {{ fqdn }}
+  register: dns_check
+  failed_when: "dns_check.stdout == '' or ansible_default_ipv4.address not in dns_check.stdout"
+  when: hosts_changed.changed or hostname_changed.changed
