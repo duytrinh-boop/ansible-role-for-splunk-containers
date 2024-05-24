@@ -12,6 +12,7 @@ fi
 export PS1='[\u@\H:$( pwd )]\$ '
 export SPLUNK_HOME={{ splunk_home }}
 export PATH=$SPLUNK_HOME/bin:$PATH
+export LD_LIBRARY_PATH=/opt/splunk/lib/:$LD_LIBRARY_PATH
 
 if [ -f  $SPLUNK_HOME/share/splunk/cli-command-completion.sh ]; then
         . $SPLUNK_HOME/share/splunk/cli-command-completion.sh
