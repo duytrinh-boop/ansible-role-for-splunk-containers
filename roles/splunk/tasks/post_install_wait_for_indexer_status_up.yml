@@ -15,7 +15,8 @@
   delay: 10
   until: 
     - response.json is defined
-    - 'response.json.entry[0].content.features["Indexer Clustering"].features["Data Durability"].health == "green"'
+    - 'response.json.entry[0].content.features["Indexer Clustering"].features["Peer Connectivity"].health == "green"'
+    - 'response.json.entry[0].content.features["Indexer Clustering"].features["Data Searchable"].health == "green"'
     - 'response.json.entry[0].content.features["Indexer Clustering"].features["Indexing Ready"].health == "green"'
   with_items:
     - "{{ groups['clustermanager'] | first }}"
