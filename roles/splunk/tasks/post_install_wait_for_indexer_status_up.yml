@@ -20,3 +20,7 @@
     - 'response.json.entry[0].content.features.splunkd.indexer_clustering.indexing_ready.health == "green"'
   with_items:
     - "{{ groups['clustermanager'] | first }}"
+
+
+# To test this manually yourself, you can log on to the cluster-manager CLI, and run a curl command
+# curl -k https://localhost:8089/services/server/health/deployment/details?output_mode=json -H "Accept: application/json" -u "admin:<instert password>"
