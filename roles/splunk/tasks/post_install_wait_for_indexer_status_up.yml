@@ -18,6 +18,7 @@
     - 'response.json.entry[0].content.features.splunkd.indexer_clustering.data_searchable.health == "green"'
     - 'response.json.entry[0].content.features.splunkd.indexer_clustering.peer_connectivity.health == "green"'
     - 'response.json.entry[0].content.features.splunkd.indexer_clustering.indexing_ready.health == "green"'
+    - 'response.json.entry[0].content.features.splunkd.indexer_clustering.indexers.health == "green"'
   with_items:
     - "{{ groups['clustermanager'] | first }}"
 
