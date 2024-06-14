@@ -2,7 +2,7 @@
 
 - name: "Wait for indexer-status to become green"
   uri:
-    url: "https://{{ item }}:8089/services/server/health/splunkd/details?output_mode=json"
+    url: "https://{{ item }}:8089/services/server/health/deployment/details?output_mode=json"
     user: "{{ splunk_admin_username }}"
     password: "{{ splunk_admin_password }}"
     validate_certs: no
@@ -15,8 +15,8 @@
   delay: 10
   until: 
     - response.json is defined
-    - 'response.json.entry[0].content.features["Indexer Clustering"].features["Peer Connectivity"].health == "green"'
-    - 'response.json.entry[0].content.features["Indexer Clustering"].features["Data Searchable"].health == "green"'
-    - 'response.json.entry[0].content.features["Indexer Clustering"].features["Indexing Ready"].health == "green"'
+    - 'response.json.entry[0].content.features.splunkd.indexer_clustering.data_searchable.health == "green"'
+    - 'response.json.entry[0].content.features.splunkd.indexer_clustering.peer_connectivity.health == "green"'
+    - 'response.json.entry[0].content.features.splunkd.indexer_clustering.indexing_ready.health == "green"'
   with_items:
     - "{{ groups['clustermanager'] | first }}"
