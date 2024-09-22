@@ -1,0 +1,36 @@
+---
+- name: "Run reload deploy-server"
+  uri:
+    url: "https://{{ inventory_hostname }}:8089/services/deployment/server/clients?output_mode=json"
+    user: "{{ splunk_admin_username }}"
+    password: "{{ splunk_admin_password }}"
+    validate_certs: no
+    return_content: yes
+  register: reload_deploy_server
+  retries: 3
+  timeout: 150 # if many apps or clients, reload make take a long time
+  delay: 5
+  until: 
+    - reload_deploy_server.json is defined
+    - reload_deploy_server.json.entry[0].content.loadTime is defined
+    - (ansible_date_time.epoch | int) - (reload_deploy_server.json.entry[0].content.loadTime | int) < 600  # Check if within last 10 minutes (600 seconds)
+
+
+  
+- name: "Wait for deployment clients to be non-empty"
+  uri:
+    url: "https://{{ inventory_hostname }}:8089/services/deployment/server/clients?output_mode=json"
+    user: "{{ splunk_admin_username }}"
+    password: "{{ splunk_admin_password }}"
+    validate_certs: no
+    return_content: yes
+  register: deployment_clients
+  retries: 10
+  timeout: 120
+  delay: 10
+  until: 
+    - deployment_clients.json is defined
+    - deployment_clients.json.entry | length > 0
+  when:
+    - reload_deploy_server.json is defined
+  debugger: on_failed
