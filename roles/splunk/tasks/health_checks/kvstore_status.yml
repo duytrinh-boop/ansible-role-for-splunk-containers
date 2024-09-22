@@ -1,0 +1,40 @@
+---
+
+- name: "Check if kvstore is enabled"
+  uri:
+    url: "https://{{ inventory_hostname }}:8089/services/server/info?output_mode=json"
+    user: "{{ splunk_admin_username }}"
+    password: "{{ splunk_admin_password }}"
+    validate_certs: no
+    return_content: yes
+  debugger: on_failed
+  register: server_info
+  retries: 5
+  timeout: 5
+  delay: 5
+  until: 
+    - server_info.json is defined
+    - 'server_info.json.entry[0].content.kvStoreStatus == "unavailable" or server_info.json.entry[0].content.kvStoreStatus == "ready"'
+
+# To test this manually yourself, you can log on to the cluster-manager CLI, and run a curl command
+# curl -k https://localhost:8089/services/server/health/deployment/details?output_mode=json -H "Accept: application/json" -u "admin:<instert password>"
+
+- name: "Verify status and backupRestoresStatus ready. Verify storageEngine=wiredTiger"
+  uri:
+    url: "https://{{ inventory_hostname }}:8089/services/server/info?output_mode=json"
+    user: "{{ splunk_admin_username }}"
+    password: "{{ splunk_admin_password }}"
+    validate_certs: no
+    return_content: yes
+  debugger: on_failed
+  register: kvstore_status
+  retries: 5
+  timeout: 5
+  delay: 5
+  until: 
+    - kvstore_status.json is defined
+    - 'kvstore_status.json.entry[0].content.current.status == "ready"'
+    - 'kvstore_status.json.entry[0].content.current.backupRestoreStatus == "Ready"'
+    - 'kvstore_status.json.entry[0].content.current.storageEngine == "wiredTiger"'
+  when:
+    - 'server_info.json.entry[0].content.kvStoreStatus == "ready"' # only do this task, if kvstore is enabled
