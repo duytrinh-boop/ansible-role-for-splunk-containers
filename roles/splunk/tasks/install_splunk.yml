@@ -42,8 +42,9 @@
 
 - name: Include configure deployment client task
   include_tasks: configure_deploymentclient.yml
+  debugger: on_skipped
   when:
-    - clientName != 'undefined'
+    # - clientName != 'undefined'
     - splunk_uri_ds != 'undefined'
 
 - name: Include configure user-seed task

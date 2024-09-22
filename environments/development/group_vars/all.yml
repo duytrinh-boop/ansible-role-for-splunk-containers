@@ -30,3 +30,5 @@ indexers_volume_hot_maxMB: 5859500 # ~ approx 5780 GB minus 1% in MB
 
 indexers_volume_cold_path: /opt/splunk/var/lib/splunk
 indexers_volume_cold_maxMB: 52445860 # ~ 51,734 GB minus 1%, in MB
+
+splunk_uri_ds: "{{ groups['deploymentserver'] | first }}"
