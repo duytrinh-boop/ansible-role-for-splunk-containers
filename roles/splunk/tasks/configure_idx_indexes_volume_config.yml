@@ -3,11 +3,13 @@
   stat:
     path: "{{ indexers_volume_hot_path }}"
   register: hot_volume_stat
+  become: true
 
 - name: Check if cold volume mount exists
   stat:
     path: "{{ indexers_volume_cold_path }}"
   register: cold_volume_stat
+  become: true
 
 - name: Fail if mounts do not exist and single_volume_for_hot_and_cold is False
   fail:
