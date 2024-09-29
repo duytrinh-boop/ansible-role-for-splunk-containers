@@ -14,6 +14,7 @@
     - reload_deploy_server.json is defined
     - reload_deploy_server.json.entry[0].content.loadTime is defined
     - (ansible_date_time.epoch | int) - (reload_deploy_server.json.entry[0].content.loadTime | int) < 600  # Check if within last 10 minutes (600 seconds)
+  when: "'deploymentserver' in group_names"
 
 
   
@@ -32,5 +33,6 @@
     - deployment_clients.json is defined
     - deployment_clients.json.entry | length > 0
   when:
+    - "'deploymentserver' in group_names"
     - reload_deploy_server.json is defined
   debugger: on_failed
