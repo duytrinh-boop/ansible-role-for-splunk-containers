@@ -53,6 +53,18 @@
     - ../environments/vault.yml
 
 - hosts:
+    - deploymentserver
+  become: true
+  any_errors_fatal: true
+  max_fail_percentage: 0
+  roles:
+    - ../roles/splunk
+  vars:
+    deployment_task: health_checks/deployment_server.yml
+  vars_files:
+    - ../environments/vault.yml
+
+- hosts:
     - search
   serial: 1
   become: true
