@@ -1,0 +1,12 @@
+---
+- name: "Include KV store health check"
+  include_tasks: health_checks/kvstore_status.yml
+
+- name: "Backup KV store if ready. This command does not run on SHC members"
+  command: "/opt/splunk/bin/splunk backup kvstore -pointInTime true"
+  register: kvstore_backup
+  when:
+    - "'shc' not in group_names"
+    - 'server_info.json.entry[0].content.kvStoreStatus == "ready"'
+    - 'kvstore_status.json.entry[0].content.current.status == "ready"'
+    - 'kvstore_status.json.entry[0].content.current.backupRestoreStatus == "Ready"'

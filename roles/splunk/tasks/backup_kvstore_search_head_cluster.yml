@@ -1,0 +1,20 @@
+# placeholder file
+# Key Points from the Documentation:
+
+#     Single Backup at a Time in a Search Head Cluster:
+#         In a Search Head Cluster, only one backup operation can take place at a time.
+#         If you try to initiate a backup on more than one search head at the same time, only one will succeed.
+
+#     Backup with Point-in-Time Consistency:
+#         The recommended command to back up the KV store with point-in-time consistency is:
+
+#         bash
+
+#     ./splunk backup kvstore -pointInTime true
+
+#     This command creates an archive file in the $SPLUNK_DB/kvstorebackup directory. Point-in-time consistency ensures that changes made during the backup are captured.
+
+# Run Backup from the Search Head:
+
+#     For a Search Head Cluster, run the backup kvstore command from the captain node (the node with the most recent data).
+#     The backup is replicated across all the nodes in the cluster, so you only need to initiate the backup from one node.
