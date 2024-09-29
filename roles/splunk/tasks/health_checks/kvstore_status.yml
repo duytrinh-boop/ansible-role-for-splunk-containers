@@ -21,7 +21,7 @@
 
 - name: "Verify status and backupRestoresStatus ready. Verify storageEngine=wiredTiger"
   uri:
-    url: "https://{{ inventory_hostname }}:8089/services/server/info?output_mode=json"
+    url: "https://{{ inventory_hostname }}:8089/services/kvstore/status?output_mode=json"
     user: "{{ splunk_admin_username }}"
     password: "{{ splunk_admin_password }}"
     validate_certs: no
