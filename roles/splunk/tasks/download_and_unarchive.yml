@@ -29,7 +29,35 @@
     remote_src: "{{ splunk_download_local | ternary( false, true ) }}"  # true == false; false == true
   become: true
   notify:
-    - start splunk
+    - start Splunk
+
+- name: Check if splunk-launch.conf.bak exists
+  stat:
+    path: "/opt/splunk/etc/splunk-launch.conf"
+  register: splunk_launch_orig
+
+# splunk 9.3 quickfix> permissions denied on startup
+- name: Set permissions on splunk-launch.conf
+  file:
+    path: "/opt/splunk/etc/splunk-launch.conf"
+    owner: "{{ splunk_nix_user }}"
+    group: "{{ splunk_nix_group }}"
+    mode: '0640' 
+  when: splunk_launch_orig.stat.exists
+
+- name: Check if splunk-launch.conf.bak exists
+  stat:
+    path: "/opt/splunk/etc/splunk-launch.conf.bak"
+  register: splunk_launch_bak
+
+- name: Set permissions on splunk-launch.conf.bak if it exists
+  file:
+    path: "/opt/splunk/etc/splunk-launch.conf.bak"
+    owner: "{{ splunk_nix_user }}"
+    group: "{{ splunk_nix_group }}"
+    mode: '0640'
+  when: splunk_launch_bak.stat.exists
+
 
 - name: "Remove {{ splunk_package_path }}/{{ splunk_file }} package"
   become: true
